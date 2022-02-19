@@ -1,12 +1,12 @@
 #include <iostream>
-#include "nodeL.hpp"
+#include "block.hpp"
 #include "list.hpp"
 #include "avl.hpp"
 using namespace std;
 
 int main(){
 
-    ForwardList<string, double, string> blockChain;
+    BlockChain<string, double, string> blockChain;
     short op;
     do
     {
@@ -25,6 +25,7 @@ int main(){
         }
         else if(op == 2){
             
+
         }
         else if (op == 3){
             string emisor, receptor;
@@ -35,7 +36,7 @@ int main(){
             cin >> monto;
             cout << "Ingrese el receptor: ";
             cin >> receptor;
-            blockChain.updateNodo(emisor, monto, receptor);
+            blockChain.insertar (emisor, monto, receptor);
         }
         else if (op == 4){
 

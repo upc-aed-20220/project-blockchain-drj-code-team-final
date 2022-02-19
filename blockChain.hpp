@@ -1,14 +1,15 @@
 template <typename T>
-struct Block {
+struct BlockChain {
     string user;
-    list<T> *data;
     string prevHash;
+    string Hash;
+    list<T> *data;
 
-    Block() {
+    BlockChain() {
         next = prev = nullptr;
     }
 
-    Block(T value) {
+    BlockChain(T value) {
         user = value;
         next = prev = nullptr;
     }

@@ -1,8 +1,8 @@
 #include <iostream>
-#include "nodeL.hpp"
+#include "blockChain.hpp"
 
 template <typename TK,typename TV1, typename TV2>
-class ForwardList {
+class CadenaBlockChain {
 private:
     struct Entry{
 		TK key;
@@ -20,12 +20,12 @@ private:
     int cantBloques;
 
 public:
-    ForwardList(){
-        head = nullptr;
+    CadenaBlockChain(){
+        tail = nullptr;
         cantBloques = 0;
     }
 
-    ~ForwardList() {                                                 
+    ~CadenaBlockChain() {                                                 
 		clear();
 		delete this->head;
     }
@@ -55,15 +55,17 @@ public:
     //}
 
     void push_back(string data) {//esta
-    
+	
         Block<Entry>* nuevo = new Block<Entry>(data);
-	    if (head == nullptr) {
-            head = nuevo;
+
+		nuevo.Hash = "0000000"; //funcion que cree el hash segun contenido
+	    if (tail == nullptr) {
             nuevo.prevHash = "0000000";
         }
 	    else {
-            nuevo.prevHash =  
+			nuevo.prevHash = tail.Hash;
 	    }
+		tail = nuevo;
 		cantBloques++;
     }
 
@@ -254,7 +256,7 @@ public:
 
 
     std::string name() {
-        return "ForwardList";
+        return "CadenaBlockChain";
     }
 
 };
