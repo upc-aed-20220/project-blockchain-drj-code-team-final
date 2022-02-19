@@ -1,15 +1,15 @@
 template <typename T>
 struct Block {
-    T data;
-    Node<T>* next;
-    Node<T>* prev;
-    int hash;
-    Node() {
+    string user;
+    list<T> *data;
+    string prevHash;
+
+    Block() {
         next = prev = nullptr;
     }
 
-    Node(T value) {
-        data = value;
+    Block(T value) {
+        user = value;
         next = prev = nullptr;
     }
 

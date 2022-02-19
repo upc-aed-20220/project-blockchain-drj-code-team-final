@@ -5,12 +5,12 @@ struct NodeBT {
     Node<T>* right;
     int altura;
 
-    Node() {
+    NodeBT() {
         left = right = nullptr;
         altura = 0;
     }
 
-    Node(T value) {
+    NodeBT(T value) {
         data = value;
         left = right = nullptr;
         altura = 0;

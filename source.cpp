@@ -6,7 +6,7 @@ using namespace std;
 
 int main(){
 
-    ForwardList<string, int, string> blockChain;
+    ForwardList<string, double, string> blockChain;
     short op;
     do
     {
@@ -24,9 +24,25 @@ int main(){
             blockChain.push_back(usuario);
         }
         else if(op == 2){
+            
+        }
+        else if (op == 3){
+            string emisor, receptor;
+            double monto;
+            cout << "Ingrese el nomnbre del emisor: ";
+            cin >> emisor;
+            cout << "Ingrese el monto a transferir: ";
+            cin >> monto;
+            cout << "Ingrese el receptor: ";
+            cin >> receptor;
+            blockChain.updateNodo(emisor, monto, receptor);
+        }
+        else if (op == 4){
 
         }
-        else if (op == 3)
+        else if (op == 5){
+
+        }
         
 
 

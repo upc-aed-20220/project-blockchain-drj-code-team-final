@@ -8,6 +8,7 @@ private:
 		TK key;
 		TV1 value1;
         TV2 value2;
+        //TV3 prevHashcode;
 		//size_t hashcode;
 		Entry(){}
 		Entry(TK _key,TV1 _value1, TV2 _value2){key = _key; value1 = _value1; value2 = _value2;}
@@ -15,9 +16,9 @@ private:
         o << n.key << ": " << n.value;
     	}
 	}; 
-
-    Block<Entry>* head;
+    Block<Entry>* tail;
     int cantBloques;
+
 public:
     ForwardList(){
         head = nullptr;
@@ -53,30 +54,31 @@ public:
 	//	this->cantBloques++;
     //}
 
-    void push_front(string data) {//esta
+    void push_back(string data) {//esta
+    
         Block<Entry>* nuevo = new Block<Entry>(data);
-	    if (this->head == nullptr) {
-		    this->head = nuevo;
-	    }
+	    if (head == nullptr) {
+            head = nuevo;
+            nuevo.prevHash = "0000000";
+        }
 	    else {
-		    nuevo->next = this->head;
-		    this->head = nuevo;
+            nuevo.prevHash =  
 	    }
-		this->cantBloques++;
+		cantBloques++;
     }
 
-    void push_back(Entry data) {//esta
-		Block<Entry>* nuevo = new Block<Entry>(data);
-        if (this->head == nullptr) {
-			this->head = nuevo;
-	    }
-	    else {
-	    	Block<Entry>* temp = this->head;
-		    while (temp->next != nullptr) { temp = temp->next; }
-	    	temp->next = nuevo;
-	    }
-		this->cantBloques++;
-    }
+    //void push_back(Entry data) {//esta
+	//	Block<Entry>* nuevo = new Block<Entry>(data);
+    //    if (this->head == nullptr) {
+	//		this->head = nuevo;
+	//    }
+	//    else {
+	//    	Block<Entry>* temp = this->head;
+	//	    while (temp->next != nullptr) { temp = temp->next; }
+	//    	temp->next = nuevo;
+	//    }
+	//	this->cantBloques++;
+    //}
 
     Entry pop_front() {//esta...
         Block<Entry>* temp = this->head;
@@ -233,10 +235,24 @@ public:
 	    return true;
     }
 
-    void Hashing(){
-		
+    void Hashing(Block<Entry> *node){
+		Block<Entry> *temp = node;
+		string user = node->key;
+		double monto = node->value1;
+		string user2 = node->value2;
+
 	}
 	
+    void updateNodo(TK emisor, TV1 v1, TV2 v2){
+        Block<Entry>* aux = head;
+        while (aux->)
+        {
+            /* code */
+        }
+        
+    }
+
+
     std::string name() {
         return "ForwardList";
     }
