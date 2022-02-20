@@ -1,24 +1,21 @@
 template <typename T>
 struct NodeBT {
     T data;
-    Node<T>* left;
-    Node<T>* right;
-    int altura;
+    NodeBT<T>* left;
+    NodeBT<T>* right;
 
     NodeBT() {
         left = right = nullptr;
-        altura = 0;
     }
 
     NodeBT(T value) {
         data = value;
         left = right = nullptr;
-        altura = 0;
     }
 
-    void killSelf() {
-        if (next != nullptr)
-            next->killSelf();
+    void killSelf(){
+        if(left != nullptr) left->killSelf();
+        if(right != nullptr) right->killSelf();
         delete this;
     }
 };

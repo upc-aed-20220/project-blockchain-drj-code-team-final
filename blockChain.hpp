@@ -1,22 +1,41 @@
+#include "forwardList.hpp"
+
 template <typename T>
 struct BlockChain {
     string user;
     string prevHash;
     string Hash;
-    list<T> *data;
+    ForwardList<T> data;
 
     BlockChain() {
-        next = prev = nullptr;
     }
 
-    BlockChain(T value) {
+    BlockChain(string value) {
         user = value;
-        next = prev = nullptr;
+    }
+
+    void ingresar_prevHash(string value) { prevHash = value; } 
+    void ingresar_Hash(string value) { prevHash = value; } 
+    string retornar_prevHash() { return prevHash;}
+    string retornar_Hash() { return Hash;}
+
+    friend bool operator > (BlockChain& b1, BlockChain& b2){
+        if (b1.Hash > b2.Hash) return true;
+        else return false;
+    }
+
+    friend bool operator < (BlockChain& b1, BlockChain& b2){
+        if (b1.Hash < b2.Hash) return true;
+        else return false;
+    }
+
+    friend ostream& operator << (ostream& o, BlockChain& n) {
+        o << n.data.display();
     }
 
     void killSelf() {
-        if (next != nullptr)
-            next->killSelf();
-        delete this;
+        /*if (prev != nullptr)
+            next->killSelf();//arreglar
+        delete this;*/
     }
 };
