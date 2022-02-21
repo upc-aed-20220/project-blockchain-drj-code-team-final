@@ -1,4 +1,5 @@
-#include "CadenaBlockChain.hpp"
+#include "doubleList.hpp"
+#include "doubleListToBlockChain.hpp"
 
 struct transaccion{
 	string emisor;
@@ -7,14 +8,71 @@ struct transaccion{
 	transaccion(){}
 	transaccion(string _emisor, double _monto, string _receptor)
     {emisor = _emisor; emisor = _monto; receptor = _receptor;}
-	friend ostream& operator << (ostream& o, transaccion& n) {
-        o << n.monto << " from " << n.emisor << " to " << n.receptor << "\n";
+    
+    //:::::::::VERSION 1::::::::: 
+	//string& operator = (string& n) {
+    //     n = to_string(monto) + " from " + emisor + " to " + receptor + "\n";
+    //     return n;
+    //}
+
+    //:::::::::VERSION 2::::::::: 
+    //friend ostream& operator << (ostream& o, transaccion& t) {
+    //    o << t.monto << " from " << t.emisor << " to " << t.receptor + "\n";
+    //}
+
+    friend ostream &operator<<(ostream& o, transaccion& t) {
+        o << t.monto << " from " << t.emisor << " to " << t.receptor + "\n";
+        return o;
     }
 }; 
 
+struct BlockChain {
+    string usuario;
+    string hashcode;
+    string prevHashCode;
+    DoubleListToBlockChain<transaccion> data;
+
+    BlockChain() {
+
+    }
+
+    BlockChain(string _usuario) {
+        usuario = _usuario;
+    }
+
+    //:::::::::VERSION 1::::::::: 
+    //friend ostream& operator << (ostream& o, BlockChain& b) {
+    //    o << b.data.display();
+    //}
+
+    //:::::::::VERSION 2::::::::: 
+    //friend ostream& operator << (ostream& o, BlockChain& b) {
+    //    b.data.display(o);
+    //}
+
+    /*friend ostream& operator<<(ostream& o, BlockChain& b) {
+        
+        int cant = 0;
+        while (cant < b.data.size()){
+            o << b.data.display(cant);
+            ++cant;
+        }
+        return o;
+        //o << b.data.display();
+    }
+ 
+    //void killSelf() {
+    //    //if (prev != nullptr)
+    //    //    next->killSelf();//arreglar
+    //    //delete this;
+    //}
+    */
+};
+
+
 int main(){
 
-    CadenaBlockChain<transaccion> cadenaBlockChain;
+    DoubleList<BlockChain> listaBlockChains;
     short op;
     bool seleccion = false;
     int criterio;
@@ -26,37 +84,49 @@ int main(){
         cout << "3. Insertar registro\n";
         cout << "4. Imprimir transacciones\n";//uncluye filtros //todas? o por bloque?
         cout << "5. Ordenar la Cadena de BlockChains en base a un criterio\n";
-        cout << "5. Salir\n";
-
+        cout << "6. Salir\n";
+        cin >> op;
+        
         if (op == 1){
-            string user;
-            cout << "Ingrese el nombre del nuevo usuario(BlockChain): ";
-            cin >> user;
-            cadenaBlockChain.agregar_blockChain(user);
-        }
-        else if(op == 2){
-            
-            
+            string usuario;
+            cout << "Ingrese el nombre del usuario: ";
+            cin >> usuario;
+            BlockChain nuevoBloque(usuario);
+            listaBlockChains.push_back(nuevoBloque);
         }
         else if (op == 3){
             string emisor, receptor;
             double monto;
-            cout << "Ingrese el nomnbre del emisor: "; //Bro le agrego un prev al Blockchain para recorrer los nodos? :´v
+            cout << "Ingrese el nombre del emisor: ";
             cin >> emisor;
-            cout << "Ingrese el monto a transferir: ";
-            cin >> monto;
-            cout << "Ingrese el receptor: ";
+            cout << "Ingrese el nombre del receptor: ";
             cin >> receptor;
-            cadenaBlockChain.agregar_registro(transaccion(emisor, monto, receptor));
+            cout << "Ingrese el monto: ";
+            cin >> monto;
+            BlockChain aux = listaBlockChains.ultimo_blockChain();
+            transaccion tra(emisor, monto, receptor);
+            aux.data.push_back(tra);
         }
         else if (op == 4){
-            cadenaBlockChain.imprimir_registros();
+            //listaBlockChains.imprimir_registros();
+            int cant = 0;
+            int tamanio = listaBlockChains.size();
+            while (cant < tamanio){
+                //cout << "hola";
+                listaBlockChains[cant].data.display();
+                cant++;
+            }
+            
+            /*int cant = 0;
+            BlockChain aux;
+            while (cant < listaBlockChains.size()){
+                aux = listaBlockChains.retornar_block_chain(cant);
+                cout << aux.data;
+                cant++;
+            }*/
         }
-
         
-
-
-    } while (op != 5);
+    } while (op != 6);
     
     
     
