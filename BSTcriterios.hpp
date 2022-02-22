@@ -1,21 +1,8 @@
 #include "string"
 #include <math.h>
 #include <iostream>
+#include "transaccion.hpp"
 using namespace std;
-
-struct transaccion{
-	string emisor;
-	double monto;
-    string receptor;
-	transaccion(){}
-	transaccion(string _emisor, double _monto, string _receptor)
-    {emisor = _emisor; monto = _monto; receptor = _receptor;}
-    
-    friend ostream &operator<<(ostream& o, transaccion& t) {
-        o << t.monto << " from " << t.emisor << " to " << t.receptor << "\n";
-        return o;
-    }
-}; 
 
 template <typename N>
 struct NodeBTFiltro {
@@ -39,7 +26,7 @@ struct NodeBTFiltro {
     }
 };
 
-
+//template <typename T, typename C>  //T: BlockChain - C: criterio(string "CantTran", string "usuario", string "MontoTotal" )
 template <typename T>
 class BSTreeFiltro {
     private:
@@ -56,12 +43,17 @@ class BSTreeFiltro {
 		    return root->data;
 	    }
 
-        void insertMonto(transaccion trans, T monto){
+        void insertMonto(transaccion trans, double monto){
             contNodos++;
             insertMonto(root,trans,monto);
         }
+        
+        //void insert(T blockChain, C criterio){
+        //      contNodos++;
+        //      if (criterio == "CantTran") insertCantTran(root, blockChain);
+        // }
 
-        void insertReceptor(transaccion trans, T receptor){
+        void insertReceptor(transaccion trans, string receptor){
             contNodos++;
             insertReceptor(root,trans,receptor);
         }
@@ -79,7 +71,7 @@ class BSTreeFiltro {
             filtroUsuario(root, usuario);
         }
 
-        void filtroReceptor(T receptor){
+        void filtroReceptor(string receptor){
             filtroReceptor(root, receptor);
         }
 
@@ -100,57 +92,67 @@ class BSTreeFiltro {
         private:
         //INSERTAR MONTOS
 
-        void insertMonto(NodeBT<T>* &node, T transaccion, T criterio){
+        void insertMonto(NodeBTFiltro<T>* &node, transaccion transaccion, double criterio){
 	    	if(node == nullptr)
-	    		node = new NodeBT<T>(transaccion);
+	    		node = new NodeBTFiltro<T>(transaccion);
 	    	else if(criterio < node->data.monto)
-	    		insert(node->left, transaccion, criterio);
+	    		insertMonto(node->left, transaccion, criterio);
 	    	else if(criterio >= node->data.monto)
-	    		insert(node->right, transaccion, criterio);
+	    		insertMonto(node->right, transaccion, criterio);
 	    }
+
+        //void inserCantTran(NodeBTFiltro<T>*& node, T BlockChain){
+        //    if (node == nullptr)
+        //        node = new NodeBTFiltro<T>(BlockChain);
+        //    else if (BlockChain < node.data)
+        //       inserCantTran(node->left, BlockChain);
+        //    else if (BlockChain >= node.data)
+        //        inserCantTran(node->right, BlockChain);
+        //}
 
         //INSERTAR USUARIOS
 
-        void insertUsuario(NodeBT<T>* &node, T transaccion, T criterio){
+        void insertUsuario(NodeBTFiltro<T>* &node, transaccion transaccion, string criterio){
 	    	if(node == nullptr)
-	    		node = new NodeBT<T>(transaccion);
+	    		node = new NodeBTFiltro<T>(transaccion);
 	    	else if(criterio < node->data.emisor)
-	    		insert(node->left, transaccion, criterio);
+	    		insertUsuario(node->left, transaccion, criterio);
 	    	else if(criterio >= node->data.emisor)
-	    		insert(node->right, transaccion, criterio);
+	    		insertUsuario(node->right, transaccion, criterio);
 	    }
 
         //INSERTAR RECEPTOR
 
-        void insertReceptor(NodeBT<T>* &node, T transaccion, T criterio){
+        void insertReceptor(NodeBTFiltro<T>* &node, transaccion transaccion, string criterio){
 	    	if(node == nullptr)
-	    		node = new NodeBT<T>(transaccion);
+	    		node = new NodeBTFiltro<T>(transaccion);
 	    	else if(criterio < node->data.receptor)
-	    		insert(node->left, transaccion, criterio);
+	    		insertReceptor(node->left, transaccion, criterio);
 	    	else if(criterio >= node->data.receptor)
-	    		insert(node->right, transaccion, criterio);
+	    		insertReceptor(node->right, transaccion, criterio);
 	    }
 
         //FILTRO RANGO DE PRECIOS
 
-        void filtroRangoMontos(NodeBT<T>* node, T montoIni, T montoFin){
+        void filtroRangoMontos(NodeBTFiltro<T>* node, double montoIni, double montoFin){
 	        if(node == nullptr)
                 return;
             else if(montoIni <= node->data.monto && node->data.monto <= montoFin){
                 cout << node->data;
-                filtroRangoMontos(node->right, T montoIni, T montoFin);
-                filtroRangoMontos(node->left, T montoIni, T montoFin);
+                filtroRangoMontos(node->right,montoIni,montoFin);
+                filtroRangoMontos(node->left,montoIni,montoFin);
             }
 	        else if(montoFin < node->data.monto)
-	            filtroRangoMontos(node->left, T montoIni, T montoFin);
+	            filtroRangoMontos(node->left,montoIni,montoFin);
 	        else if(montoIni > node->data.monto)
-	            filtroRangoMontos(node->right, T montoIni, T montoFin);
+	            filtroRangoMontos(node->right,montoIni,montoFin);
             return;
 	    }
+        
 
         //FILTRO USUARIO
 
-        void filtroUsuario(NodeBT<T>* node, T usuario){
+        void filtroUsuario(NodeBTFiltro<T>* node, string usuario){
 	        if(node == nullptr)
                 return;
 	        else if(usuario < node->data.emisor)
@@ -166,7 +168,7 @@ class BSTreeFiltro {
 
         //FILTRO RECEPTOR
 
-        void filtroReceptor(NodeBT<T>* node, T recep){
+        void filtroReceptor(NodeBTFiltro<T>* node, string recep){
 	        if(node == nullptr)
                 return;
 	        else if(recep < node->data.receptor)

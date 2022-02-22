@@ -1,26 +1,26 @@
 #include "doubleList.hpp"
 #include "BSTseguridad.hpp"
-//#include "BSTcriterios.hpp"
+#include "BSTcriterios.hpp"
 #include <stdlib.h>
 
-struct transaccion{
-	string emisor;
-	double monto;
-    string receptor;
-	transaccion(){}
-	transaccion(string _emisor, double _monto, string _receptor)
-    {emisor = _emisor; monto = _monto; receptor = _receptor;}
-    
-    friend ostream &operator<<(ostream& o, transaccion& t) {
-        o << t.monto << " from " << t.emisor << " to " << t.receptor << "\n";
-        return o;
-    }
-	void extraer_valores(string& _emisor, string& _receptor, double& _monto){
-		_emisor = emisor;
-		_receptor = receptor;
-		_monto = monto;
-	}
-}; 
+//struct transaccion{
+//	string emisor;
+//	double monto;
+//    string receptor;
+//	transaccion(){}
+//	transaccion(string _emisor, double _monto, string _receptor)
+//    {emisor = _emisor; monto = _monto; receptor = _receptor;}
+//    
+//    friend ostream &operator<<(ostream& o, transaccion& t) {
+//        o << t.monto << " from " << t.emisor << " to " << t.receptor << "\n";
+//        return o;
+//    }
+//	void extraer_valores(string& _emisor, string& _receptor, double& _monto){
+//		_emisor = emisor;
+//		_receptor = receptor;
+//		_monto = monto;
+//	}
+//}; 
 
 struct BlockChain {
     string usuario;
@@ -39,6 +39,20 @@ struct BlockChain {
         usuario = _usuario;
         prevHashCode = _prevHashCode;
     }
+	
+	//friend bool operator < (string& criterio, BlockChain& b){
+	// if (criterio == "cantTran") {
+	// b.data,size();
+	//
+	//
+	// }
+	//
+	//
+	//
+	//
+    //    if (b1.hashcode < b2.hashcode) return true;
+    //    else return false;
+    //}
 
     friend void operator << (ostream& o, BlockChain& b){
         b.data.imprimir_registros();
@@ -167,14 +181,29 @@ void leer_archivo(DoubleList<BlockChain>& lista){
     	}
 }
 
+void HashTrunc(DoubleList<BlockChain> d,string user){
+	int j = 0;
+	for(int i = 0;i < d.size();++i){
+		 if(d[i].usuario == user){
+			 j = i;
+			 break;
+		 }
+	}
+
+	for (int i = j; i < d.size();++i){
+		d[i].Hashing();
+	}
+
+
+}
 
 int main(){
 
     DoubleList<BlockChain> listaBlockChains;
     BSTree<BlockChain> arbolBlockChains;
-	//BSTreeFiltro<transaccion> arbolTransaccionesUsuario;
-	//BSTreeFiltro<transaccion> arbolTransaccionesReceptor;
-	//BSTreeFiltro<transaccion> arbolTransaccionesMonto;
+	BSTreeFiltro<transaccion> arbolTransaccionesUsuario;
+	BSTreeFiltro<transaccion> arbolTransaccionesReceptor;
+	BSTreeFiltro<transaccion> arbolTransaccionesMonto;
 
     short op;
     bool seleccion = false;
@@ -234,14 +263,16 @@ int main(){
             arbolBlockChains[0].data.push_back(transaccion(emisor, monto, receptor));
 
 			//Insercion de arboles de criterios
-			//arbolTransaccionesUsuario.insertUsuario(transaccion(emisor,monto,receptor), emisor);
+			arbolTransaccionesUsuario.insertUsuario(transaccion(emisor,monto,receptor), emisor);
+			arbolTransaccionesReceptor.insertReceptor(transaccion(emisor,monto,receptor), receptor);
+			arbolTransaccionesMonto.insertMonto(transaccion(emisor,monto,receptor), monto);
 			
         }
         else if (op == 5){
             listaBlockChains.imprimir_registros();
             cout << "Desea volver al menu?: ";
             cin >> regresar;
-            if (regresar == 'n') op = 7;
+            if (regresar == 'n') op = 8;
         }
         else if (op == 6){
             arbolBlockChains.display();
@@ -249,6 +280,44 @@ int main(){
             cin >> regresar;
             if (regresar == 'n') op = 8;
         }
+		else if (op == 7){
+            system("cls");
+            cout << ":::::::::MENU::::::::::\n";
+            cout << "1. Usuario\n";
+		    cout << "2. Receptor\n";
+            cout << "3. Monto\n";
+			int posss;
+			cin >> posss;
+			if(posss==1){
+				string usuario;
+				cout << "Ingrese el usuario para buscar sus transacciones" << endl;
+				cin >> usuario;
+				arbolTransaccionesUsuario.filtroUsuario(usuario);
+				cout << "Desea volver al menu?: ";
+                cin >> regresar;
+                if (regresar == 'n') op = 8;
+			}
+			if(posss==2){
+				string receptor;
+				cout << "Ingrese el receptor para buscar las transacciones" << endl;
+				cin >> receptor;
+				arbolTransaccionesReceptor.filtroReceptor(receptor);
+				cout << "Desea volver al menu?: ";
+                cin >> regresar;
+                if (regresar == 'n') op = 8;
+			}
+			if(posss==3){
+				double montoIni, montoFin;
+				cout << "Ingrese el monto inicial del rango de montos" << endl;
+				cin >> montoIni;
+				cout << "Ingrese el monto final del rango de montos" << endl;
+				cin >> montoFin;
+				arbolTransaccionesMonto.filtroRangoMontos(montoIni,montoFin);
+				cout << "Desea volver al menu?: ";
+                cin >> regresar;
+                if (regresar == 'n') op = 8;
+			}
+		}
         
         
     } while (op != 8);
