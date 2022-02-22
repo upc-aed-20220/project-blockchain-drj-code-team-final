@@ -1,5 +1,6 @@
 #include "doubleList.hpp"
 #include "BSTseguridad.hpp"
+//#include "BSTcriterios.hpp"
 #include <stdlib.h>
 
 struct transaccion{
@@ -14,6 +15,11 @@ struct transaccion{
         o << t.monto << " from " << t.emisor << " to " << t.receptor << "\n";
         return o;
     }
+	void extraer_valores(string& _emisor, string& _receptor, double& _monto){
+		_emisor = emisor;
+		_receptor = receptor;
+		_monto = monto;
+	}
 }; 
 
 struct BlockChain {
@@ -28,10 +34,6 @@ struct BlockChain {
     BlockChain(string _usuario) {
         usuario = _usuario;
     }
-
-    //BlockChain(string _usuario) {
-    //    usuario = _usuario;
-    //}
 
     BlockChain(string _usuario, string _prevHashCode) {
         usuario = _usuario;
@@ -51,6 +53,10 @@ struct BlockChain {
         if (b1.hashcode > b2.hashcode) return true;
         else return false;
     }
+	
+	void extraer_valores_data(int index, string& emisor, string& receptor, double& monto){
+		data[index].extraer_valores(emisor,receptor,monto);
+	}
 
     void Hashing() {
 		int aux = 0;
@@ -109,9 +115,31 @@ struct BlockChain {
 };
 
 
-    
+void escribir_archivo(DoubleList<BlockChain>& lista){
+	ofstream arcEsc("datos.txt");
+	int cantBlockChains = lista.size();
+	int indexBlockChain = 0;
+	int cantRegistros;
+	int indexRegistro = 0;
+	string emisor, receptor;
+	double monto;
+	if (arcEsc.is_open()){
+		while (indexBlockChain < cantBlockChains)
+		{
+			cantRegistros = lista[indexBlockChain].data.size();
+			while (indexRegistro < cantRegistros)
+			{
+				lista[indexBlockChain].extraer_valores_data(indexRegistro,emisor,receptor,monto);
+				arcEsc << monto << "|" << emisor << "|" << receptor << "\n";
+				indexRegistro++;
+			}
+			indexRegistro = 0;
+			indexBlockChain++;
+		}
 
-
+		arcEsc.close();
+	}
+}
 
 void leer_archivo(DoubleList<BlockChain>& lista){
 
@@ -144,9 +172,10 @@ int main(){
 
     DoubleList<BlockChain> listaBlockChains;
     BSTree<BlockChain> arbolBlockChains;
-    BSTree<BlockChain> arbolBlockChains1;
-    BSTree<BlockChain> arbolBlockChains2;
-    BSTree<BlockChain> arbolBlockChains3;
+	//BSTreeFiltro<transaccion> arbolTransaccionesUsuario;
+	//BSTreeFiltro<transaccion> arbolTransaccionesReceptor;
+	//BSTreeFiltro<transaccion> arbolTransaccionesMonto;
+
     short op;
     bool seleccion = false;
     int criterio;
@@ -156,23 +185,24 @@ int main(){
         system("cls");
         cout << ":::::::::MENU::::::::::\n";
         cout << "1. Crear nuevo usuario(BlockChain)\n";
-        cout << "2. Cargar datos\n";
-        cout << "3. Insertar registro\n";
-        cout << "4. Imprimir transacciones\n";
-        cout << "5. Imprimir arbol de seguridad\n";
-        cout << "6. Ordenar la Cadena de BlockChains en base a un criterio\n";
-        cout << "7. Salir\n";
+		cout << "2. Subir Datos\n";
+        cout << "3. Descargar datos\n";
+        cout << "4. Insertar registro\n";
+        cout << "5. Imprimir transacciones\n";
+        cout << "6. Imprimir arbol de seguridad\n";
+        cout << "7. Ordenar la Cadena de BlockChains en base a un criterio\n";
+        cout << "8. Salir\n";
         cout << "Opcion: "; cin >> op;
         
         if (op == 1){
             string nombre;
-            int ultimo = listaBlockChains.size();
+            int ultimo = listaBlockChains.size() - 1;
             cout << "Ingresar nombre del blockChain: ";
             cin >> nombre;
             BlockChain nuevo;
             nuevo.usuario = nombre;
             if(listaBlockChains.size() != 0){
-                string prevHash = listaBlockChains[ultimo-1].prevHashCode;
+                string prevHash = listaBlockChains[ultimo].prevHashCode;
                 nuevo.prevHashCode = prevHash;
             }
 
@@ -181,12 +211,14 @@ int main(){
             arbolBlockChains.insert(nuevo);
 
         }
-        else if (op == 2){
-            leer_archivo(listaBlockChains);
-            
-           
-        }
+		else if (op == 2){
+			escribir_archivo(listaBlockChains);
+		}
         else if (op == 3){
+			listaBlockChains.clear();
+            leer_archivo(listaBlockChains);
+        }
+        else if (op == 4){
             string emisor, receptor;
             double monto;
             cout << "Ingrese el nombre del emisor: ";
@@ -196,26 +228,30 @@ int main(){
             cout << "Ingrese el monto: ";
             cin >> monto;
 
-            int ultimo = listaBlockChains.size();
-            listaBlockChains[ultimo - 1].data.push_back(transaccion(emisor, monto, receptor));
+            int ultimo = listaBlockChains.size() - 1;
+            listaBlockChains[ultimo].data.push_back(transaccion(emisor, monto, receptor));
 
             arbolBlockChains[0].data.push_back(transaccion(emisor, monto, receptor));
+
+			//Insercion de arboles de criterios
+			//arbolTransaccionesUsuario.insertUsuario(transaccion(emisor,monto,receptor), emisor);
+			
         }
-        else if (op == 4){
+        else if (op == 5){
             listaBlockChains.imprimir_registros();
             cout << "Desea volver al menu?: ";
             cin >> regresar;
             if (regresar == 'n') op = 7;
         }
-        else if (op == 5){
+        else if (op == 6){
             arbolBlockChains.display();
             cout << "Desea volver al menu?: ";
             cin >> regresar;
-            if (regresar == 'n') op = 7;
+            if (regresar == 'n') op = 8;
         }
         
         
-    } while (op != 7);
+    } while (op != 8);
     
     
     

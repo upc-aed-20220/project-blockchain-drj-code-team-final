@@ -1,0 +1,4 @@
+78.9|Rafael|Eliana
+45.6|Rafael|Carlos
+98.7|Michael|Tiago
+65.4|Michael|Liam
