@@ -1,7 +1,30 @@
 #include "string"
 #include <math.h>
-#include "nodeBT.hpp"
+#include <iostream>
 using namespace std;
+
+template <typename N>
+struct NodeBT {
+    N data;
+    NodeBT<N>* left;
+    NodeBT<N>* right;
+
+    NodeBT() {
+        left = right = nullptr;
+    }
+
+    NodeBT(N value) {
+        data = value;
+        left = right = nullptr;
+    }
+
+    void killSelf(){
+        if(left != nullptr) left->killSelf();
+        if(right != nullptr) right->killSelf();
+        delete this;
+    }
+};
+
 
 template <typename T>
 class BSTree {
@@ -10,6 +33,14 @@ class BSTree {
         int contNodos;
     public:
         BSTree(): root(nullptr),contNodos(0) {}
+
+        //T& retornar_root(){
+        //    return root->data;
+        //}
+
+        T& operator[](int pos) {
+		    return root->data;
+	    }
 
 		void insert(T value){
             contNodos++;
@@ -94,7 +125,7 @@ class BSTree {
 
         void clear(){
             contNodos=0;
-            root->KillSelf();
+            root->killSelf();
             root = nullptr;
         }
         
@@ -182,9 +213,9 @@ class BSTree {
 
         void display(NodeBT<T>* node){
             if(node == nullptr) return;
-            displayInOrder(node->left);
+            display(node->left);
             cout << node->data;
-            displayInOrder(node->right);
+            display(node->right);
         }
 
         string displayPosOrder(NodeBT<T>* node){

@@ -1,21 +1,22 @@
-//#include "nodeLista.hpp"
-//#include "blockChain.hpp"
-
 #include <iostream>
 #include <string>
+#include <string.h>
+#include <fstream>
+#include <sstream>
+
 using namespace std;
 
 template <typename N>
-struct Node1 {
+struct Node {
     N data;
-    Node1<N>* next;
-    Node1<N>* prev;
+    Node<N>* next;
+    Node<N>* prev;
 
-    Node1 () {
+    Node () {
         next = prev = nullptr;
     }
 
-    Node1(N value) {
+    Node(N value) {
         data = value;
         next = prev = nullptr;
     }
@@ -30,8 +31,8 @@ struct Node1 {
 template <typename T>
 class DoubleList {
 private:
-    Node1<T>* head;
-    Node1<T>* tail;
+    Node<T>* head;
+    Node<T>* tail;
     int nodes;
 public:
     DoubleList() {
@@ -54,7 +55,7 @@ public:
 	}
 
 	void push_front(T data) {
-		Node1<T>* nuevo = new Node1<T>(data);
+		Node<T>* nuevo = new Node<T>(data);
 		if (this->head == nullptr) {
 			this->head = this->tail = nuevo;
 		}
@@ -67,7 +68,7 @@ public:
 	}
 
 	void push_back(T data) {
-		Node1<T>* nuevo = new Node1<T>(data);//nodo de tipo T
+		Node<T>* nuevo = new Node<T>(data);
 		if (this->head == nullptr) {
 			this->head = this->tail = nuevo;
 		}
@@ -130,8 +131,8 @@ public:
 			push_back(data);
 		}
 		else {
-			Node1<T>* nuevo = new Node1<T>(data);
-			Node1<T>* temp = this->head;
+			Node<T>* nuevo = new Node<T>(data);
+			Node<T>* temp = this->head;
 			for (int i = 1; i < pos - 1; i++) {
 				temp = temp->next;
 			}
@@ -153,11 +154,11 @@ public:
 			pop_back();
 		}
 		else {
-			Node1<T>* temp = this->head;
+			Node<T>* temp = this->head;
 			for (int i = 1; i < pos - 1; i++) {
 				temp = temp->next;
 			}
-			Node1<T>* temp1 = temp->next;
+			Node<T>* temp1 = temp->next;
 			temp->next = temp1->next;
 			temp1->next->prev = temp;
 			delete temp1;//revisar delete
@@ -167,7 +168,7 @@ public:
 	}
 
 	T& operator[](int pos) {//se puede mejorar (que pasa si el arreglo es de 100000)
-		Node1<T>* temp = this->head;
+		Node<T>* temp = this->head;
 		for (int i = 0; i < pos; i++) {
 			temp = temp->next;
 		}
@@ -194,7 +195,7 @@ public:
 /*
 	void sort() {
 		int tamanio = size();
-		Node1<T>* a1, *a2;
+		Node<T>* a1, *a2;
 		for (int i = 1; i <= tamanio; i++)
 		{
 			a1 = this->head; a2 = a1->next;
@@ -238,7 +239,7 @@ public:
 /*	
     bool is_sorted() {
 		int num = -1;
-		Node1<T>* temp = this->head;
+		Node<T>* temp = this->head;
 		while (temp != nullptr) {
 			if (num <= temp->data) {
 				num = temp->data;
@@ -251,30 +252,14 @@ public:
 		return true;
 		}
 */
-    T& ultimo_blockChain(){
-        return tail->data;
-    }
 
-    void imprimir_registros(){
-        Node1<T>* temp = head;
+	void imprimir_registros(){
+        Node<T>* temp = head;
         while (temp != nullptr){
             cout << temp->data;
             temp = temp->next;
         }
-        
     }
 
-    void retornar_block_chain(int index){
-        Node1<T>* temp = head;
-        //int cant = 0;
-        //while (cant < index)
-        //    temp = temp->next;
-        //
-        //return tail->data;
-        while (temp != nullptr){
-            cout << temp->data;
-        }
-        
-    }
 
 };
