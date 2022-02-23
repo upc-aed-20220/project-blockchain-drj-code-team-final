@@ -23,21 +23,21 @@
 //}; 
 
 struct BlockChain {
-    string usuario;
-    string hashcode;
-    string prevHashCode;
-    DoubleList<transaccion> data;
+    string usuario; // ---> 1
+    string hashcode; // ---> 1
+    string prevHashCode; // ---> 1
+    DoubleList<transaccion> data; //---> 1
 
     BlockChain() {
     }
 
-    BlockChain(string _usuario) {
-        usuario = _usuario;
+    BlockChain(string _usuario) { //---> O(1)
+        usuario = _usuario; //---> 1
     }
 
-    BlockChain(string _usuario, string _prevHashCode) {
-        usuario = _usuario;
-        prevHashCode = _prevHashCode;
+    BlockChain(string _usuario, string _prevHashCode) {//---> O(1)
+        usuario = _usuario; //---> 1
+        prevHashCode = _prevHashCode;//---> 1
     }
 	
 	//friend bool operator < (string& criterio, BlockChain& b){
@@ -54,82 +54,86 @@ struct BlockChain {
     //    else return false;
     //}
 
-	friend bool operator == (BlockChain& b, string& s){
-		if (b.usuario == s) return true;
-		else return false;
+	friend bool operator == (BlockChain& b, string& s){ //---> O(1)
+		if (b.usuario == s) return true; // ---> 2
+		else return false; // ---> 1
 	}
 
-    friend void operator << (ostream& o, BlockChain& b){
-        b.data.imprimir_registros();
+    friend void operator << (ostream& o, BlockChain& b){ //---> O( k )
+        b.data.imprimir_registros(); // ---> K ,  K: cantidad de registros del BlockChain
     }
 
-    friend bool operator < (BlockChain& b1, BlockChain& b2){
-        if (b1.hashcode < b2.hashcode) return true;
-        else return false;
+    friend bool operator < (BlockChain& b1, BlockChain& b2){ //---> O(1)
+        if (b1.hashcode < b2.hashcode) return true; // ---> 2
+        else return false; // ---> 1
     }
 
-    friend bool operator > (BlockChain& b1, BlockChain& b2){
-        if (b1.hashcode > b2.hashcode) return true;
-        else return false;
+    friend bool operator > (BlockChain& b1, BlockChain& b2){ //---> O(1)
+        if (b1.hashcode > b2.hashcode) return true; // ---> 2
+        else return false; // ---> 1
     }
 	
-	void extraer_valores_data(int index, string& emisor, string& receptor, double& monto){
-		data[index].extraer_valores(emisor,receptor,monto);
+	void extraer_valores_data(int index, string& emisor, string& receptor, double& monto){ //---> O( k )
+		data[index].extraer_valores(emisor,receptor,monto); //---> K
 	}
 
-    void Hashing() {
-		int aux = 0;
-	    int aux2 = 0;
-	    int aux3 = 0;
-	    string t;
-	    int j = 0;
-	    int num;
-	    t.resize(11);
-
-	    for (int i = 0; i < usuario.length(); ++i) {
-		    aux = aux + (int)usuario[i];//suma todos los ascii del usuario	
-	    }
-	    for (int i = 0; i < 1; ++i) {
-            string s = data[i].receptor;
-            aux2 = aux2 + (int)s[0];//suma los ascii de la primera letra de cada persona
-	    }
-	    for (int i = 0; i < 1; ++i) {
-            double s = data[i].monto;
-		    aux3 = aux3 + (int)s;//suma los montos 		
-	    }
-
-	    for (int i = 0; i < 11; ++i) {
+	// q : cantidad de letras del usuario , K: cantidad de registros del BlockChain
+    void Hashing() { // O( q ) + O( K ) 
+		int aux = 0; // ---> 1
+	    int aux2 = 0; // ---> 1
+	    int aux3 = 0; // ---> 1
+	    string t; // ---> 1
+	    int j = 0; // ---> 1
+	    int num; // ---> 1
+	    t.resize(11); // ---> 1
 		
-		    if (i < 5) {//Condicional para insertar solo la parte del usuario
-			    num = aux + (int)prevHashCode[j];
+	    for (int i = 0; i < usuario.length(); ++i) { //---> 1 + q(2+4+2) = O( q )
+		    //suma todos los ascii del usuario	
+			aux = aux + (int)usuario[i]; // ---> 4
+	    }
+		int tamanho = data.size(); // ---> 2
+	    for (int i = 0; i < tamanho; ++i) { // ---> 1 + k(1+7+2) = O( K )
+            string s = data[i].receptor; // --> 3
+            //suma los ascii de la primera letra de cada persona
+			aux2 = aux2 + (int)s[0]; // ---> 4
+	    }
+	    for (int i = 0; i < tamanho; ++i) { // 1 + k(1+6+2) = O( k )
+            double s = data[i].monto; // ---> 3
+			//suma los montos 
+		    aux3 = aux3 + (int)s; // ---> 3	
+		}
+	    for (int i = 0; i < 11; ++i) { // ---> 1 + 11(1 + 7 + 13 + 2) = 254
+		    if (i < 5) { // ---> 1 + 4 = 5
+				//Condicional para insertar solo la parte del usuario
+			    num = aux + (int)prevHashCode[j]; // ---> 4
 		    }
-		    else if (5 <= i && i < 10) {//Condicional para insertar solo la parte del receptor
-			    num = aux2 + (int)prevHashCode[j];
+		    else if (5 <= i && i < 10) { // ---> 3 + 4 = 7
+				//Condicional para insertar solo la parte del receptor
+			    num = aux2 + (int)prevHashCode[j]; // ---> 4
 		    }
-		    else {//Condicional para insertar solo la parte del monto
-			    num = aux3 + (int)prevHashCode[j];
+		    else {// ---> 4
+				//Condicional para insertar solo la parte del monto
+			    num = aux3 + (int)prevHashCode[j]; // ---> 4
 		    }
-
             // Condicionales para realizar un hash estable que depende del prevhash y de los datos del bloque
-            //Se inserta el char en la pos i del hash
-            if (num % 2 == 0 && (int)prevHashCode[j] %2 == 0) {
-				    num = 48 + num % 10;
-				    t[j] = char(num);
-			}else if(num % 2 == 0 && (int)prevHashCode[j] % 2 != 0){
-				    num = 65 + num % 25;
-				    t[j] = char(num);
-			}else if (num % 2 != 0 && (int)prevHashCode[j] % 2 != 0) {
-				    num = 97 + num % 25;
-				    t[j] = char(num);
-			}else if (num % 2 != 0 && (int)prevHashCode[j] % 2 == 0) {
-				    num = 35 + num % 4;
-				    t[j] = char(num);
+            // Se inserta el char en la pos i del hash
+            if (num % 2 == 0 && (int)prevHashCode[j] %2 == 0) {// 7 + 6 = 13
+				    num = 48 + num % 10; // ---> 3
+				    t[j] = char(num); // ---> 3
+			}else if(num % 2 == 0 && (int)prevHashCode[j] % 2 != 0){// 7 + 6 = 13
+				    num = 65 + num % 25; // ---> 3
+				    t[j] = char(num); // ---> 3
+			}else if (num % 2 != 0 && (int)prevHashCode[j] % 2 != 0) {// 7 + 6 = 13
+				    num = 97 + num % 25; // ---> 3
+				    t[j] = char(num); // ---> 3
+			}else if (num % 2 != 0 && (int)prevHashCode[j] % 2 == 0) { // 7 + 6 = 13
+				    num = 35 + num % 4; // ---> 3
+				    t[j] = char(num); // ---> 3
 			}
-			    ++j;
-		
+			    ++j; // ---> 2
 	    }
-
-        hashcode = t;//Se asigna el valor al hash
+		//Se asigna el valor al hash
+        hashcode = t; // ---> 2
     }
 };
 
@@ -190,11 +194,16 @@ void leer_archivo(DoubleList<BlockChain>& lista, BSTreeFiltro<transaccion>& arbo
     	}
 		
 }
+
 bool VerificarFallo(DoubleList<BlockChain> d){
-	//for (int i = 0;i<d.size();++i){
-	//	
-	//}
+	for (int i = 0;i<d.size()-1;++i){
+		if(d[i].hashcode != d[i+1].prevHashCode){
+			return true;
+		}
+	}
+	return false;
 }
+
 int VerificarNuevo(DoubleList<BlockChain> d,string s){
 
 	for (int i = 0;i<d.size();++i){
@@ -204,6 +213,7 @@ int VerificarNuevo(DoubleList<BlockChain> d,string s){
 	}
 	
 }
+
 void HashTrunc(DoubleList<BlockChain> d,string user){
 	int j = 0;
 	for(int i = 0;i < d.size();++i){
@@ -245,7 +255,7 @@ int main(){
         cout << "4. Descargar Datos\n";
         cout << "5. Imprimir todas las transacciones\n";
         cout << "6. Ordenar la Cadena de BlockChains en base a un criterio\n";
-		cout << "7. Agregar registro a un usuario anterior\n";
+		cout << "7. Agregar registro a un usuario anterior (forzar cambio)\n";
 		cout << "8. Agregar registro a un usuario anterior maleficamente\n";
 		cout << "9. verificar hashes enlazados\n";
 		cout << "10. Salir\n";
@@ -423,7 +433,11 @@ int main(){
 			listaBlockChains[VerificarNuevo(listaBlockChains,emisor)].data.push_back(transaccion(emisor, monto, receptor));
 			listaBlockChains[VerificarNuevo(listaBlockChains, emisor)].Hashing();
 		}else if(op == 9){
-
+			if(VerificarFallo(listaBlockChains) == true){
+				cout << "Se encontro un fallo de hashs";
+			}else{
+				cout << "No hay fallo en los hashes";
+			}
 		}
         
         
