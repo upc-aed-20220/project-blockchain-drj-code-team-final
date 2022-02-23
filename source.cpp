@@ -160,7 +160,7 @@ void escribir_archivo(DoubleList<BlockChain>& lista){
 	}
 }
 
-void leer_archivo(DoubleList<BlockChain>& lista){
+void leer_archivo(DoubleList<BlockChain>& lista, BSTreeFiltro<transaccion>& arbolEmisores, BSTreeFiltro<transaccion>& arbolReceptores, BSTreeFiltro<transaccion>& arbolMontos){
 
 		ifstream arcLec("datos.txt");
 		string registro,campo;
@@ -177,14 +177,20 @@ void leer_archivo(DoubleList<BlockChain>& lista){
     		    receptor = campo;
 
                 lista.push_back(emisor);
-                int ultimo = lista.size();
-                lista[ultimo - 1].data.push_back(transaccion(emisor, monto, receptor));
+                int ultimo = lista.size() - 1;
+                lista[ultimo].data.push_back(transaccion(emisor, monto, receptor));
+
+				arbolEmisores.insertUsuario(transaccion(emisor,monto,receptor), emisor);
+				arbolReceptores.insertReceptor(transaccion(emisor,monto,receptor), receptor);
+				arbolMontos.insertMonto(transaccion(emisor,monto,receptor), monto);
 
     		    //cout<<monto<<"|"<<emisor<<"|"<<receptor<<"\n";
     		}
     		arcLec.close();
     	}
+		
 }
+
 bool VerificarNuevo(DoubleList<BlockChain> d,string s){
 
 	for (int i = 0;i<d.size();++i){
@@ -235,7 +241,8 @@ int main(){
         cout << "4. Descargar Datos\n";
         cout << "5. Imprimir todas las transacciones\n";
         cout << "6. Ordenar la Cadena de BlockChains en base a un criterio\n";
-        cout << "7. Salir\n";
+		cout << "7. Agregar registro a un usuario anterior\n";
+        cout << "8. Salir\n";
         cout << "Opcion: "; cin >> op;
         
         if (op == 1){
@@ -272,17 +279,25 @@ int main(){
             cin >> monto;
 
             int ultimo = listaBlockChains.size() - 1;
-            listaBlockChains[ultimo].data.push_back(transaccion(emisor, monto, receptor));
+			if (listaBlockChains[ultimo].usuario == emisor){
+				listaBlockChains[ultimo].data.push_back(transaccion(emisor, monto, receptor));
 			
-			//HashTrunc(listaBlockChains,emisor);
-			
+				//HashTrunc(listaBlockChains,emisor);
 
-			// arbolBlockChains[0].data.push_back(transaccion(emisor, monto, receptor));
 
-			//Insercion de arboles de criterios
-			arbolTransaccionesUsuario.insertUsuario(transaccion(emisor,monto,receptor), emisor);
-			arbolTransaccionesReceptor.insertReceptor(transaccion(emisor,monto,receptor), receptor);
-			arbolTransaccionesMonto.insertMonto(transaccion(emisor,monto,receptor), monto);
+				// arbolBlockChains[0].data.push_back(transaccion(emisor, monto, receptor));
+
+				//Insercion de arboles de criterios
+				arbolTransaccionesUsuario.insertUsuario(transaccion(emisor,monto,receptor), emisor);
+				arbolTransaccionesReceptor.insertReceptor(transaccion(emisor,monto,receptor), receptor);
+				arbolTransaccionesMonto.insertMonto(transaccion(emisor,monto,receptor), monto);
+			}
+			else {
+				char op2;
+				cout << "No existe ese usuario, desea volver al menu?: \n";
+				cin >> op2;
+				if (op2 == 'n') op = 8;
+			}
 
 		}
         else if (op == 3){
@@ -290,7 +305,10 @@ int main(){
         }
         else if (op == 4){
             listaBlockChains.clear();
-            leer_archivo(listaBlockChains);
+			arbolTransaccionesUsuario.clear();
+			arbolTransaccionesReceptor.clear();
+			arbolTransaccionesMonto.clear();
+            leer_archivo(listaBlockChains,arbolTransaccionesUsuario,arbolTransaccionesReceptor,arbolTransaccionesMonto);
         }
         else if (op == 5){
             listaBlockChains.imprimir_registros();
@@ -298,7 +316,7 @@ int main(){
             cin >> regresar;
             if (regresar == 'n') op = 8;
         } 
-		else if (op == 6){
+		else if (op == 6){//falta completar los filtros
             system("cls");
             cout << ":::::::::MENU::::::::::\n";
             cout << "1. Usuario igual a\n";
@@ -317,27 +335,27 @@ int main(){
                 cin >> regresar;
                 if (regresar == 'n') op = 8;
 			}
-			if(posss==2){
+			if(posss==2){//no funciona
 				string usuario;
-				cout << "Ingrese el usuario para buscar sus transacciones" << endl;
+				cout << "Ingrese la primera letra: " << endl;
 				cin >> usuario;
 				arbolTransaccionesUsuario.filtroUsuarioIniciaCon(usuario);
 				cout << "Desea volver al menu?: ";
                 cin >> regresar;
                 if (regresar == 'n') op = 8;
 			}
-			if(posss==3){
+			if(posss==3){//no funciona
 				string usuario;
-				cout << "Ingrese el usuario para buscar sus transacciones" << endl;
+				cout << "Ingrese el usuario para buscar sus transacciones: " << endl;
 				cin >> usuario;
 				arbolTransaccionesUsuario.filtroUsuarioFinalizaCon(usuario);
 				cout << "Desea volver al menu?: ";
                 cin >> regresar;
                 if (regresar == 'n') op = 8;
 			}
-			if(posss==4){
+			if(posss==4){// funciona solo para el primer blockChain
 				string receptor;
-				cout << "Ingrese el receptor para buscar las transacciones" << endl;
+				cout << "Ingrese el receptor para buscar las transacciones: " << endl;
 				cin >> receptor;
 				arbolTransaccionesReceptor.filtroReceptor(receptor);
 				cout << "Desea volver al menu?: ";
@@ -346,7 +364,7 @@ int main(){
 			}
 			if(posss==5){
 				double montoIni, montoFin;
-				cout << "Ingrese el monto inicial del rango de montos" << endl;
+				cout << "Ingrese el monto inicial del rango de montos: " << endl;
 				cin >> montoIni;
 				cout << "Ingrese el monto final del rango de montos" << endl;
 				cin >> montoFin;
@@ -356,14 +374,13 @@ int main(){
                 if (regresar == 'n') op = 8;
 			}
 		}
+		else if (op == 7){
+
+		}
         
         
-    } while (op != 7);
+    } while (op != 8);
     
-    
-    
-
-
 }
 /*
 void Hashing1(double montos[], string usuario, string receptores[], string prevhash) {
