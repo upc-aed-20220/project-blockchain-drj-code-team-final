@@ -46,6 +46,16 @@ public:
 		delete this->head;
     }
 
+	bool find(string value){
+		Node<T>* temp = head;
+		while (temp != nullptr)
+		{
+			if (temp->data == value) return true;
+			temp = temp->next;
+		}
+		return false;
+	}
+
 	T front() {
 		return this->head->data;
 	}

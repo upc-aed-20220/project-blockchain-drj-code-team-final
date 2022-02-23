@@ -67,8 +67,16 @@ class BSTreeFiltro {
             filtroRangoMontos(root, montoIni, montoFin);
         }	
 
-        void filtroUsuario(string usuario){
-            filtroUsuario(root, usuario);
+        void filtroUsuarioIgualA(string usuario){
+            filtroUsuarioIgualA(root, usuario);
+        }
+
+        void filtroUsuarioIniciaCon(string usuario){
+            filtroUsuarioIniciaCon(root, usuario);
+        }
+
+        void filtroUsuarioFinalizaCon(string usuario){
+            filtroUsuarioFinalizaCon(root, usuario);
         }
 
         void filtroReceptor(string receptor){
@@ -150,23 +158,59 @@ class BSTreeFiltro {
 	    }
         
 
-        //FILTRO USUARIO
+        //FILTRO USUARIO IGUAL A
 
-        void filtroUsuario(NodeBTFiltro<T>* node, string usuario){
+        void filtroUsuarioIgualA(NodeBTFiltro<T>* node, string usuario){
 	        if(node == nullptr)
                 return;
 	        else if(usuario < node->data.emisor)
-	            filtroUsuario(node->left, usuario);
+	            filtroUsuarioIgualA(node->left, usuario);
 	        else if(usuario > node->data.emisor)
-	            filtroUsuario(node->right, usuario);
+	            filtroUsuarioIgualA(node->right, usuario);
 	        else if(usuario == node->data.emisor){
                 cout << node->data;
-                filtroUsuario(node->right, usuario);
+                filtroUsuarioIgualA(node->right, usuario);
             }
             return;
 	    }
 
-        //FILTRO RECEPTOR
+        //FILTRO USUARIO INICIA CON
+
+        void filtroUsuarioIniciaCon(NodeBTFiltro<T>* node, string usuario){
+	        if(node == nullptr)
+                return;
+            else if(usuario[0] == node->data.emisor[0]){
+                cout << node->data;
+                filtroUsuarioIniciaCon(node->right, usuario);
+                filtroUsuarioIniciaCon(node->left, usuario);
+            }
+	        else if(usuario[0] < node->data.emisor[0])
+	            filtroUsuarioIniciaCon(node->left, usuario);
+	        else if(usuario[0] > node->data.emisor[0])
+	            filtroUsuarioIniciaCon(node->right, usuario);
+
+            return;
+	    }
+
+        //FILTRO USUARIO FINALIZA CON
+
+        void filtroUsuarioFinalizaCon(NodeBTFiltro<T>* node, string usuario){
+            int tamano = node->data.emisor.size();
+	        if(node == nullptr)
+                return;
+	        else if(usuario[0] < node->data.emisor[tamano-1])
+	            filtroUsuarioFinalizaCon(node->left, usuario);
+	        else if(usuario[0] > node->data.emisor[tamano-1])
+	            filtroUsuarioFinalizaCon(node->right, usuario);
+	        else if(usuario[0] == node->data.emisor[tamano-1]){
+                cout << node->data;
+                filtroUsuarioFinalizaCon(node->right, usuario);
+                filtroUsuarioFinalizaCon(node->left, usuario);
+            }
+            return;
+	    }
+
+        //FILTRO RECEPTOR IGUAL A
 
         void filtroReceptor(NodeBTFiltro<T>* node, string recep){
 	        if(node == nullptr)
