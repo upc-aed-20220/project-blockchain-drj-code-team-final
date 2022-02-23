@@ -190,15 +190,19 @@ void leer_archivo(DoubleList<BlockChain>& lista, BSTreeFiltro<transaccion>& arbo
     	}
 		
 }
-
-bool VerificarNuevo(DoubleList<BlockChain> d,string s){
+bool VerificarFallo(DoubleList<BlockChain> d){
+	//for (int i = 0;i<d.size();++i){
+	//	
+	//}
+}
+int VerificarNuevo(DoubleList<BlockChain> d,string s){
 
 	for (int i = 0;i<d.size();++i){
 		if(d[i].usuario == s){
-			 return true;
+			return i;
 		 }
 	}
-	return false;
+	
 }
 void HashTrunc(DoubleList<BlockChain> d,string user){
 	int j = 0;
@@ -242,7 +246,9 @@ int main(){
         cout << "5. Imprimir todas las transacciones\n";
         cout << "6. Ordenar la Cadena de BlockChains en base a un criterio\n";
 		cout << "7. Agregar registro a un usuario anterior\n";
-        cout << "8. Salir\n";
+		cout << "8. Agregar registro a un usuario anterior maleficamente\n";
+		cout << "9. verificar hashes enlazados\n";
+		cout << "10. Salir\n";
         cout << "Opcion: "; cin >> op;
         
         if (op == 1){
@@ -281,9 +287,8 @@ int main(){
             int ultimo = listaBlockChains.size() - 1;
 			if (listaBlockChains[ultimo].usuario == emisor){
 				listaBlockChains[ultimo].data.push_back(transaccion(emisor, monto, receptor));
-			
-				//HashTrunc(listaBlockChains,emisor);
 
+				listaBlockChains[ultimo].Hashing();
 
 				// arbolBlockChains[0].data.push_back(transaccion(emisor, monto, receptor));
 
@@ -318,12 +323,14 @@ int main(){
         } 
 		else if (op == 6){//falta completar los filtros
             system("cls");
-            cout << ":::::::::MENU::::::::::\n";
+            cout << ":::::::::FILTROS::::::::::\n";
             cout << "1. Usuario igual a\n";
             cout << "2. Usuario inicia con\n";
-		    cout << "3. Usuario finaliza con\n";
-		    cout << "4. Receptor\n";
-            cout << "5. Monto\n";
+		    cout << "3. Receptor igual a\n";
+            cout << "4. Receptor inicia con\n";
+			cout << "5. Rango de Montos\n";
+            cout << "6. Montos mayores\n";
+		    cout << "7. Montos menores\n";
 			int posss;
 			cin >> posss;
 			if(posss==1){
@@ -335,36 +342,36 @@ int main(){
                 cin >> regresar;
                 if (regresar == 'n') op = 8;
 			}
-			if(posss==2){//no funciona
+			else if(posss==2){
 				string usuario;
-				cout << "Ingrese la primera letra: " << endl;
+				cout << "Ingrese el usuario para buscar sus transacciones" << endl;
 				cin >> usuario;
 				arbolTransaccionesUsuario.filtroUsuarioIniciaCon(usuario);
 				cout << "Desea volver al menu?: ";
                 cin >> regresar;
                 if (regresar == 'n') op = 8;
 			}
-			if(posss==3){//no funciona
-				string usuario;
-				cout << "Ingrese el usuario para buscar sus transacciones: " << endl;
-				cin >> usuario;
-				arbolTransaccionesUsuario.filtroUsuarioFinalizaCon(usuario);
-				cout << "Desea volver al menu?: ";
-                cin >> regresar;
-                if (regresar == 'n') op = 8;
-			}
-			if(posss==4){// funciona solo para el primer blockChain
+			else if(posss==3){
 				string receptor;
-				cout << "Ingrese el receptor para buscar las transacciones: " << endl;
+				cout << "Ingrese el receptor para buscar sus transacciones" << endl;
 				cin >> receptor;
-				arbolTransaccionesReceptor.filtroReceptor(receptor);
+				arbolTransaccionesReceptor.filtroReceptorIgualA(receptor);
 				cout << "Desea volver al menu?: ";
                 cin >> regresar;
                 if (regresar == 'n') op = 8;
 			}
-			if(posss==5){
+			else if(posss==4){
+				string receptor;
+				cout << "Ingrese el receptor para buscar las transacciones" << endl;
+				cin >> receptor;
+				arbolTransaccionesReceptor.filtroReceptorIniciaCon(receptor);
+				cout << "Desea volver al menu?: ";
+                cin >> regresar;
+                if (regresar == 'n') op = 8;
+			}
+			else if(posss==5){
 				double montoIni, montoFin;
-				cout << "Ingrese el monto inicial del rango de montos: " << endl;
+				cout << "Ingrese el monto inicial del rango de montos" << endl;
 				cin >> montoIni;
 				cout << "Ingrese el monto final del rango de montos" << endl;
 				cin >> montoFin;
@@ -373,77 +380,53 @@ int main(){
                 cin >> regresar;
                 if (regresar == 'n') op = 8;
 			}
+			else if(posss==6){
+				double monto;
+				cout << "Ingrese el monto" << endl;
+				cin >> monto;
+				arbolTransaccionesMonto.filtroMontosMayores(monto);
+				cout << "Desea volver al menu?: ";
+                cin >> regresar;
+                if (regresar == 'n') op = 8;
+			}
+			else if(posss==7){
+				double monto;
+				cout << "Ingrese el monto" << endl;
+				cin >> monto;
+				arbolTransaccionesMonto.filtroMontosMenores(monto);
+				cout << "Desea volver al menu?: ";
+                cin >> regresar;
+                if (regresar == 'n') op = 8;
+			}
 		}
 		else if (op == 7){
+			string emisor, receptor;
+            double monto;
+            cout << "Ingrese el nombre del emisor: ";
+            cin >> emisor;
+            cout << "Ingrese el nombre del receptor: ";
+            cin >> receptor;
+            cout << "Ingrese el monto: ";
+            cin >> monto;
+
+			listaBlockChains[VerificarNuevo(listaBlockChains,emisor)].data.push_back(transaccion(emisor, monto, receptor));
+			HashTrunc(listaBlockChains,emisor);
+		}else if(op == 8){
+			string emisor, receptor;
+            double monto;
+            cout << "Ingrese el nombre del emisor: ";
+            cin >> emisor;
+            cout << "Ingrese el nombre del receptor: ";
+            cin >> receptor;
+            cout << "Ingrese el monto: ";
+            cin >> monto;
+			listaBlockChains[VerificarNuevo(listaBlockChains,emisor)].data.push_back(transaccion(emisor, monto, receptor));
+			listaBlockChains[VerificarNuevo(listaBlockChains, emisor)].Hashing();
+		}else if(op == 9){
 
 		}
         
         
-    } while (op != 8);
+    } while (op != 10);
     
 }
-/*
-void Hashing1(double montos[], string usuario, string receptores[], string prevhash) {
-	int aux = 0;
-	int aux2 = 0;
-	int aux3 = 0;
-	string t;
-	float n = usuario.length() / 5;
-	int j = 0;
-	int num;
-	t.resize(11);
-	for (int i = 0; i < usuario.length(); ++i) {
-
-		aux = aux + (int)usuario[i];//suma todos los ascii del usuario
-		if ((int)(n * j) == i) {
-
-			num = aux + (int)prevhash[j];
-			if (num % 2 == 0) {
-				num = 48 + num % 10;
-				t[j] = char(num);
-			}
-			else {
-				num = 65 + num % 25;
-				t[j] = char(num);
-			}
-			++j;
-		}
-	}
-	j = 0;
-	n = 5 / 5;
-	for (int i = 0; i < 5; ++i) {
-		aux2 = aux2 + (int)receptores[i][0];//suma los ascii de la primera letra de cada persona
-
-		if ((int)(n * j) == i) {
-
-			num = aux2 + (int)prevhash[j + 5];
-			if (num % 2 == 0) {
-				num = 48 + num % 10;
-				t[j + 5] = char(num);
-			}
-			else {
-				num = 65 + num % 25;
-				t[j + 5] = char(num);
-			}
-			++j;
-		}
-	}
-	for (int i = 0; i < 5; ++i) {
-		aux3 = aux3 + (int)montos[i];//suma los montos 		
-	}
-	num = aux3 + (int)prevhash[10];
-	if (num % 2 == 0) {
-		num = 48 + num % 10;
-		t[10] = char(num);
-	}
-	else {
-		num = 65 + num % 25;
-		t[10] = char(num);
-	}
-
-	for (int i = 0; i < 11; ++i) {
-		cout << t[i] << " ";
-	}
-
-}
-*/
