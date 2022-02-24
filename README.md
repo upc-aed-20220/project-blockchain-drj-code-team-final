@@ -2,3 +2,5 @@
 
 Integrantes:
 1. Rafael Adrián Urquiaga Rodríguez
+2. Diego Eloy Quispe Palacin
+3. Juan Pablo Palacios Torres

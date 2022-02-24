@@ -96,9 +96,12 @@ class BSTreeFiltro {
         }
 
         void clear(){
-            contNodos=0;
-            root->killSelf();
-            root = nullptr;
+            if (root != nullptr){
+                contNodos=0;
+                root->killSelf();
+                root = nullptr;
+            }
+            
         }
         
         ~BSTreeFiltro(){

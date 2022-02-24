@@ -1,5 +1,4 @@
 #include "doubleList.hpp"
-#include "BSTseguridad.hpp"
 #include "BSTcriterios.hpp"
 #include <stdlib.h>
 
@@ -28,80 +27,63 @@ struct BlockChain {
     string prevHashCode; // ---> 1
     DoubleList<transaccion> data; //---> 1
 
-    BlockChain() {
-    }
+    BlockChain() {}
 
     BlockChain(string _usuario) { //---> O(1)
         usuario = _usuario; //---> 1
     }
-
     BlockChain(string _usuario, string _prevHashCode) {//---> O(1)
         usuario = _usuario; //---> 1
         prevHashCode = _prevHashCode;//---> 1
     }
-	
-	//friend bool operator < (string& criterio, BlockChain& b){
-	// if (criterio == "cantTran") {
-	// b.data,size();
-	//
-	//
-	// }
-	//
-	//
-	//
-	//
-    //    if (b1.hashcode < b2.hashcode) return true;
-    //    else return false;
-    //}
-
 	friend bool operator == (BlockChain& b, string& s){ //---> O(1)
 		if (b.usuario == s) return true; // ---> 2
 		else return false; // ---> 1
 	}
-
     friend void operator << (ostream& o, BlockChain& b){ //---> O( k )
         b.data.imprimir_registros(); // ---> K ,  K: cantidad de registros del BlockChain
     }
-
     friend bool operator < (BlockChain& b1, BlockChain& b2){ //---> O(1)
         if (b1.hashcode < b2.hashcode) return true; // ---> 2
         else return false; // ---> 1
     }
-
     friend bool operator > (BlockChain& b1, BlockChain& b2){ //---> O(1)
         if (b1.hashcode > b2.hashcode) return true; // ---> 2
         else return false; // ---> 1
     }
-	
 	void extraer_valores_data(int index, string& emisor, string& receptor, double& monto){ //---> O( k )
 		data[index].extraer_valores(emisor,receptor,monto); //---> K
 	}
-
 	// q : cantidad de letras del usuario , K: cantidad de registros del BlockChain
     void Hashing() { // O( q ) + O( K ) 
-		int aux = 0; // ---> 1
+		int aux = 20; // ---> 1
 	    int aux2 = 0; // ---> 1
 	    int aux3 = 0; // ---> 1
 	    string t; // ---> 1
 	    int j = 0; // ---> 1
 	    int num; // ---> 1
 	    t.resize(11); // ---> 1
-		
-	    for (int i = 0; i < usuario.length(); ++i) { //---> 1 + q(2+4+2) = O( q )
+
+
+		int tamanoUsuario = usuario.length();
+	    for (int i = 0; i < tamanoUsuario;i++) { //---> 1 + q(2+4+2) = O( q )
 		    //suma todos los ascii del usuario	
 			aux = aux + (int)usuario[i]; // ---> 4
 	    }
+
 		int tamanho = data.size(); // ---> 2
 	    for (int i = 0; i < tamanho; ++i) { // ---> 1 + k(1+7+2) = O( K )
             string s = data[i].receptor; // --> 3
             //suma los ascii de la primera letra de cada persona
 			aux2 = aux2 + (int)s[0]; // ---> 4
 	    }
+
 	    for (int i = 0; i < tamanho; ++i) { // 1 + k(1+6+2) = O( k )
             double s = data[i].monto; // ---> 3
 			//suma los montos 
 		    aux3 = aux3 + (int)s; // ---> 3	
 		}
+
 	    for (int i = 0; i < 11; ++i) { // ---> 1 + 11(1 + 7 + 13 + 2) = 254
 		    if (i < 5) { // ---> 1 + 4 = 5
 				//Condicional para insertar solo la parte del usuario
@@ -132,11 +114,26 @@ struct BlockChain {
 			}
 			    ++j; // ---> 2
 	    }
+
 		//Se asigna el valor al hash
-        hashcode = t; // ---> 2
+        hashcode = t; // ---> 1
     }
 };
 
+void HashTrunc(DoubleList<BlockChain>& d, string user){
+	int j = 0;
+	int tam = d.size();
+	for(int i = 0;i < tam; i++)
+		 if(d[i].usuario == user){
+			 j = i;
+			 break;
+		 }
+
+	for (int i = j; i < tam; i++){
+		d[i].Hashing();
+		if (i+1 < tam) d[i+1].prevHashCode = d[i].hashcode; 	
+	}
+}
 
 void escribir_archivo(DoubleList<BlockChain>& lista){
 	ofstream arcEsc("datos.txt");
@@ -166,47 +163,70 @@ void escribir_archivo(DoubleList<BlockChain>& lista){
 
 void leer_archivo(DoubleList<BlockChain>& lista, BSTreeFiltro<transaccion>& arbolEmisores, BSTreeFiltro<transaccion>& arbolReceptores, BSTreeFiltro<transaccion>& arbolMontos){
 
-		ifstream arcLec("datos.txt");
-		string registro,campo;
-		string emisor, receptor;
-		double monto;
-    	if (arcLec.is_open()){
-    	    while(getline(arcLec,registro)){
-    		    stringstream am(registro);
-    		    getline(am,campo,'|');
-    		    monto = stod(campo);
-    		    getline(am,campo,'|');
-    		    emisor = campo;
-    		    getline(am,campo);
-    		    receptor = campo;
+	ifstream arcLec("datos.txt");
+	string registro,campo;
+	string emisor, receptor;
+	double monto;
+	string emisorAnterior = "nada";
+	int ultimo;
+    if (arcLec.is_open()){
+        while(getline(arcLec,registro)){
+    	    stringstream am(registro);
+    	    getline(am,campo,'|');
+    	    monto = stod(campo);
+    	    getline(am,campo,'|');
+    	    emisor = campo;
+    	    getline(am,campo);
+    	    receptor = campo;
+			
+			ultimo = lista.size() - 1;
 
-                lista.push_back(emisor);
-                int ultimo = lista.size() - 1;
-                lista[ultimo].data.push_back(transaccion(emisor, monto, receptor));
+			if (emisor != emisorAnterior){
+			    BlockChain nuevo;
+			    nuevo.usuario=emisor;
+				
+				if(ultimo == -1) {
+					nuevo.prevHashCode = "12357011135";
+				}
+				else {//listaBlockChains.size()
+					string hashCodeAnterior = lista[ultimo].hashcode;
+                	nuevo.prevHashCode = hashCodeAnterior;
+				}
+				ultimo++;
+				lista.push_back(nuevo);
+				emisorAnterior = emisor;
+			}
+            
+			lista[ultimo].data.push_back(transaccion(emisor, monto, receptor));
+			lista[ultimo].Hashing();
+			//HashTrunc(lista,emisor);
 
-				arbolEmisores.insertUsuario(transaccion(emisor,monto,receptor), emisor);
-				arbolReceptores.insertReceptor(transaccion(emisor,monto,receptor), receptor);
-				arbolMontos.insertMonto(transaccion(emisor,monto,receptor), monto);
-
-    		    //cout<<monto<<"|"<<emisor<<"|"<<receptor<<"\n";
-    		}
-    		arcLec.close();
+			arbolEmisores.insertUsuario(transaccion(emisor,monto,receptor), emisor);
+			arbolReceptores.insertReceptor(transaccion(emisor,monto,receptor), receptor);
+			arbolMontos.insertMonto(transaccion(emisor,monto,receptor), monto);
+			
     	}
-		
+    	arcLec.close();
+    }
 }
 
-bool VerificarFallo(DoubleList<BlockChain> d){
-	for (int i = 0;i<d.size()-1;++i){
-		if(d[i].hashcode != d[i+1].prevHashCode){
-			return true;
+void VerificarFallo(DoubleList<BlockChain>& d){
+	int tam = d.size() - 1;
+	for (int i = 0; i < tam; i++){		
+		if(d[i].hashcode == d[i+1].prevHashCode){
+			cout << "Hashcode: " << d[i].hashcode << "-- PrevHashcode: " << d[i + 1].prevHashCode<<"\n";
+		}else{
+			cout << "Error en el hash de la pos " << i<<"\n";
+			cout << "Hashcode: " << d[i].hashcode << " -- PrevHashcode: " << d[i + 1].prevHashCode<<"\n";
 		}
 	}
-	return false;
+
 }
 
-int VerificarNuevo(DoubleList<BlockChain> d,string s){
+int VerificarNuevo(DoubleList<BlockChain>& d,string s){
 
-	for (int i = 0;i<d.size();++i){
+	int tamanio = d.size();
+	for (int i = 0; i < tamanio; i++){
 		if(d[i].usuario == s){
 			return i;
 		 }
@@ -214,29 +234,14 @@ int VerificarNuevo(DoubleList<BlockChain> d,string s){
 	
 }
 
-void HashTrunc(DoubleList<BlockChain> d,string user){
-	int j = 0;
-	for(int i = 0;i < d.size();++i){
-		 if(d[i].usuario == user){
-			 j = i;
-			 break;
-		 }
-	}
-
-
-	for (int i = j; i < d.size();++i){
-		d[i].Hashing();
-	}
-}
-
 bool revisar_existencia_del_blockChain(DoubleList<BlockChain>& b, string& usuario){
 	 return b.find(usuario);
 }
 
+
 int main(){
 
     DoubleList<BlockChain> listaBlockChains;
-    BSTree<BlockChain> arbolBlockChains;
 	BSTreeFiltro<transaccion> arbolTransaccionesUsuario;
 	BSTreeFiltro<transaccion> arbolTransaccionesReceptor;
 	BSTreeFiltro<transaccion> arbolTransaccionesMonto;
@@ -258,6 +263,7 @@ int main(){
 		cout << "7. Agregar registro a un usuario anterior (forzar cambio)\n";
 		cout << "8. Agregar registro a un usuario anterior maleficamente\n";
 		cout << "9. verificar hashes enlazados\n";
+		cout << "11. Cantidad BlockChains\n";
 		cout << "10. Salir\n";
         cout << "Opcion: "; cin >> op;
         
@@ -265,9 +271,9 @@ int main(){
             string nombre;
             int ultimo = listaBlockChains.size() - 1;
 			bool existencia = true;
+			bool existencia2 = true;
 
-			while (existencia == true)
-			{
+			while (existencia == true){
 				cout << "Ingresar nombre del blockChain: ";
             	cin >> nombre;
 				existencia = revisar_existencia_del_blockChain(listaBlockChains, nombre);
@@ -276,13 +282,13 @@ int main(){
 
 			BlockChain nuevo;//posiblemente se deba inicializar el hashCode en 00000000000
             nuevo.usuario = nombre;
-            if(listaBlockChains.size() != 0){
+			if( (ultimo + 1) == 0) nuevo.prevHashCode = "12357011135";
+            else if( (ultimo + 1) != 0){//listaBlockChains.size()
                 string hashCodeAnterior = listaBlockChains[ultimo].hashcode;
                 nuevo.prevHashCode = hashCodeAnterior;
             }
-
             listaBlockChains.push_back(nuevo);
-			
+
         }
 		else if (op == 2){
 			string emisor, receptor;
@@ -299,8 +305,6 @@ int main(){
 				listaBlockChains[ultimo].data.push_back(transaccion(emisor, monto, receptor));
 
 				listaBlockChains[ultimo].Hashing();
-
-				// arbolBlockChains[0].data.push_back(transaccion(emisor, monto, receptor));
 
 				//Insercion de arboles de criterios
 				arbolTransaccionesUsuario.insertUsuario(transaccion(emisor,monto,receptor), emisor);
@@ -418,8 +422,13 @@ int main(){
             cin >> receptor;
             cout << "Ingrese el monto: ";
             cin >> monto;
+			int index = VerificarNuevo(listaBlockChains,emisor);
+			listaBlockChains[index].data.push_back(transaccion(emisor, monto, receptor));
 
-			listaBlockChains[VerificarNuevo(listaBlockChains,emisor)].data.push_back(transaccion(emisor, monto, receptor));
+			arbolTransaccionesUsuario.insertUsuario(transaccion(emisor,monto,receptor), emisor);
+			arbolTransaccionesReceptor.insertReceptor(transaccion(emisor,monto,receptor), receptor);
+			arbolTransaccionesMonto.insertMonto(transaccion(emisor,monto,receptor), monto);
+			
 			HashTrunc(listaBlockChains,emisor);
 		}else if(op == 8){
 			string emisor, receptor;
@@ -430,14 +439,21 @@ int main(){
             cin >> receptor;
             cout << "Ingrese el monto: ";
             cin >> monto;
-			listaBlockChains[VerificarNuevo(listaBlockChains,emisor)].data.push_back(transaccion(emisor, monto, receptor));
-			listaBlockChains[VerificarNuevo(listaBlockChains, emisor)].Hashing();
+			
+			int index = VerificarNuevo(listaBlockChains,emisor);
+			listaBlockChains[index].data.push_back(transaccion(emisor, monto, receptor));
+
+			listaBlockChains[index].Hashing();
 		}else if(op == 9){
-			if(VerificarFallo(listaBlockChains) == true){
-				cout << "Se encontro un fallo de hashs";
-			}else{
-				cout << "No hay fallo en los hashes";
-			}
+			VerificarFallo(listaBlockChains);
+			system("pause");
+		}
+		else if (op == 11){
+			char regresar;
+			cout << listaBlockChains.size() << "\n";
+			cout << "Desea volver al menu?: ";
+            cin >> regresar;
+            if (regresar == 'n') op = 10;
 		}
         
         

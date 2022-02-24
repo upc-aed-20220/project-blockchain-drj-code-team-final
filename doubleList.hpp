@@ -194,74 +194,13 @@ public:
 	}
 
 	void clear() {
-		if (this->head == nullptr) delete this->head;
-		else
-		{
+
+		if (this->head != nullptr){
 			this->head->killSelf();
 			this->head = nullptr;
 			this->nodes = 0;
 		}
 	}
-/*
-	void sort() {
-		int tamanio = size();
-		Node<T>* a1, *a2;
-		for (int i = 1; i <= tamanio; i++)
-		{
-			a1 = this->head; a2 = a1->next;
-			for (int j = 1; j <= tamanio; j++)
-			{
-				if (a1->data > a2->data)
-				{
-					if (a1 == this->head)
-					{
-						a2->prev = nullptr;
-						a1->next = a2->next;
-						a1->prev = a2;
-						a2->next = a1;
-						this->head = a2;
-					}
-					else if (a2->next == nullptr)
-					{
-						a1->prev->next = a2;
-						a2->prev = a1->prev;
-						a1->next = nullptr;
-						a1->prev = a2;
-						a2->next = a1;
-					}
-					else
-					{
-						a1->prev->next = a2;
-						a2->next->prev = a1;
-						a2->prev = a1->prev;
-						a1->next = a2->next;
-						a1->prev = a2;
-						a2->next = a1;
-					}
-				}
-				else a1 = a1->next;
-
-				a2 = a1->next;
-			}
-		}
-	}
-*/
-/*	
-    bool is_sorted() {
-		int num = -1;
-		Node<T>* temp = this->head;
-		while (temp != nullptr) {
-			if (num <= temp->data) {
-				num = temp->data;
-			}
-			else {
-				return false;
-			}
-			temp = temp->next;
-		}
-		return true;
-		}
-*/
 
 	void imprimir_registros(){
         Node<T>* temp = head;
