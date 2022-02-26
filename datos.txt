@@ -1,0 +1,16 @@
+78.9|Rafael|Diego
+100.2|Rafael|Delta
+89.2|Rafael|Aritoteles
+45.9|Rafael|Augusto
+12.8|Rafael|Henry
+45.6|Diego|Juan
+12.3|Diego|Carlos
+65.4|Pedro|Delaila
+94.7|Pedro|Misha
+10.5|Pedro|Machi
+22.8|Pedro|Mindy
+10.3|Ben|Tenyson
+40.2|Ben|Vilgax
+31.1|Ben|Max
+32.1|Vilgax|Azmut
+53.1|Kevin|Levin
